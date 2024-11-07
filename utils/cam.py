@@ -3,22 +3,37 @@
 import cv2
 
 
-def open_cam():
-    # Open the camera (0 is usually the default camera)
-    cap = cv2.VideoCapture(0)
+class Camera:
+    def __init__(self):
+        # Initialize the current frame to None
+        self.current_frame = None
 
-    # Check if the camera opened successfully
-    if not cap.isOpened():
-        print("Error: Could not open camera.")
-        return None
+        # Open the camera using OpenCV (0 refers to the default camera)
+        self.cap = cv2.VideoCapture(0)
 
-    # Read a single frame from the camera
-    ret, frame = cap.read()
-    if not ret:
-        print("Error: Could not read frame.")
-        cap.release()
-        return None
+    def start_opencv_window(self):
+        # Continuously capture frames from the camera
+        while True:
+            # Read a frame from the camera
+            ret, frame = self.cap.read()
+            if not ret:
+                # If frame capture fails, skip this iteration
+                continue
 
-    # Release the camera after capturing the frame
-    cap.release()
-    return frame
+            # Display the captured frame in an OpenCV window
+            cv2.imshow("Camera", frame)
+
+            # Update the current frame to the latest captured frame
+            self.current_frame = frame
+
+            # Exit the loop if the 'q' key is pressed
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+
+        # Release the camera and close OpenCV windows when done
+        self.cap.release()
+        cv2.destroyAllWindows()
+
+    def get_current_frame(self):
+        # Return the most recent captured frame
+        return self.current_frame

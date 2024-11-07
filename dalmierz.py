@@ -1,11 +1,11 @@
 # main.py
 
-from utils.gui import CameraGUI
+from utils.gui import GUI
 
 
 def main():
     # Create an instance of the CameraGUI class
-    app = CameraGUI()
+    app = GUI()
     app.mainloop()  # Run the Tkinter event loop to display the GUI
 
 
