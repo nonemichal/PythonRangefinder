@@ -6,6 +6,8 @@ import cv2
 from pathlib import Path
 import os
 import time
+import csv
+import re
 
 current_folder = Path(__file__).parent
 
@@ -46,9 +48,9 @@ def find_max_coordinates_convolution(image1_array, image2_array):
 
 
 def find_max_coordinates_sum(image1_array, image2_array):
-    # Wytnij fragment o rozmiarach 190:250 dla x i wszystkie y (użyj tylko czerwonego kanału)
-    image1_array_section = image1_array[190:250, :, 0]
-    image2_array_section = image2_array[190:250, :, 0]
+    # Wytnij fragment o rozmiarach 180:250 dla x i wszystkie y (użyj tylko czerwonego kanału)
+    image1_array_section = image1_array[180:250, :, 0]
+    image2_array_section = image2_array[180:250, :, 0]
 
     # Oblicz różnicę, unikając zawijania
     red_channel = image2_array_section.astype(np.int16) - image1_array_section.astype(
@@ -73,7 +75,7 @@ def find_max_coordinates_sum(image1_array, image2_array):
     full_red_channel = np.zeros_like(image1_array[:, :, 0], dtype=np.uint8)
 
     # Wstaw wartości z red_channel do odpowiedniego paska
-    full_red_channel[190:250, :] = red_channel
+    full_red_channel[180:250, :] = red_channel
 
     return max_index, np.max(red_sum), full_red_channel
 
@@ -107,7 +109,7 @@ def calculate_distance(path1, path2, method="sum"):
     result_image = Image.fromarray(red_channel)
 
     # Zapisz wynik jako obraz PNG
-    result_image.save(current_folder / ".." / "photos" / "result_image.png")
+    result_image.save(current_folder / ".." / "photos2" / "result_image.png")
     print("Obraz wynikowy zapisany jako result_image.png")
     print("Najwyższa średnia intensywność czerwieni:", max_intensity)
     print("Współrzędne ramki o najwyższej intensywności:", max_coordinates)
@@ -131,6 +133,10 @@ def calculate_distance(path1, path2, method="sum"):
     return distance, max_coordinates, max_intensity
 
 
+def extract_num_from_filename(filename):
+    match = re.search(r'\d+', filename)
+    return match.group(0) if match else None
+
 def process_all_pairs(folder_path):
     folder = Path(folder_path)
     image_files = sorted(folder.glob("*.png"))
@@ -145,10 +151,15 @@ def process_all_pairs(folder_path):
     total_time_sum = 0
     num_pairs = 0
 
+    # Lista do przechowywania wyników
+    results = []
+
     # Przetwarzanie każdej pary obrazów
     for path1, path2 in image_pairs:
         if os.path.exists(path1) and os.path.exists(path2):
             print(f"\n\nPrzetwarzanie pary: {path1} i {path2}")
+
+            num = extract_num_from_filename(Path(path1).name)
 
             # Oblicz dystans metodą konwolucji
             print("METODA KONWOLUCJI")
@@ -160,6 +171,15 @@ def process_all_pairs(folder_path):
             time_conv = end_time_conv - start_time_conv
             total_time_conv += time_conv
 
+            # Dodaj wyniki do listy
+            results.append({
+                "num": num,
+                "method": "convolution",
+                "time": time_conv,
+                "distance": distance_conv,
+                "pixel": max_coordinates_conv[1]
+            })
+
             # Oblicz dystans metodą sumowania
             print("METODA SUMOWANIA")
             start_time_sum = time.time()
@@ -169,6 +189,15 @@ def process_all_pairs(folder_path):
             end_time_sum = time.time()
             time_sum = end_time_sum - start_time_sum
             total_time_sum += time_sum
+
+            # Dodaj wyniki do listy
+            results.append({
+                "num": num,
+                "method": "sum",
+                "time": time_sum,
+                "distance": distance_sum,
+                "pixel": max_coordinates_sum[1]
+            })
 
             num_pairs += 1
 
@@ -185,6 +214,14 @@ def process_all_pairs(folder_path):
         print(f"\n\nŚredni czas wykonywania metody konwolucji: {avg_time_conv:.4f} sekund")
         print(f"Średni czas wykonywania metody sumowania: {avg_time_sum:.4f} sekund")
 
+    # Zapisz wyniki do pliku CSV
+    with open(current_folder / ".." / "results.csv", mode="w", newline="") as csv_file:
+        fieldnames = ["num", "method", "time", "distance", "pixel"]
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+        for result in results:
+            writer.writerow(result)
+
     # Usuń plik result_image.png, jeśli istnieje
     result_image_path = folder / "result_image.png"
 
@@ -197,5 +234,5 @@ def process_all_pairs(folder_path):
 
 if __name__ == "__main__":
     # Ścieżka do folderu z obrazami
-    input_folder = current_folder / ".." / "photos"
+    input_folder = current_folder / ".." / "photos2"
     process_all_pairs(input_folder)
