@@ -134,8 +134,9 @@ def calculate_distance(path1, path2, method="sum"):
 
 
 def extract_num_from_filename(filename):
-    match = re.search(r'\d+', filename)
+    match = re.search(r"\d+", filename)
     return match.group(0) if match else None
+
 
 def process_all_pairs(folder_path):
     folder = Path(folder_path)
@@ -172,13 +173,15 @@ def process_all_pairs(folder_path):
             total_time_conv += time_conv
 
             # Dodaj wyniki do listy
-            results.append({
-                "num": num,
-                "method": "convolution",
-                "time": time_conv,
-                "pixel": max_coordinates_conv[1],
-                "distance": distance_conv
-            })
+            results.append(
+                {
+                    "num": num,
+                    "method": "convolution",
+                    "time": time_conv,
+                    "pixel": max_coordinates_conv[1],
+                    "distance": distance_conv,
+                }
+            )
 
             # Oblicz dystans metodą sumowania
             print("METODA SUMOWANIA")
@@ -191,13 +194,15 @@ def process_all_pairs(folder_path):
             total_time_sum += time_sum
 
             # Dodaj wyniki do listy
-            results.append({
-                "num": num,
-                "method": "sum",
-                "time": time_sum,
-                "pixel": max_coordinates_sum[1],
-                "distance": distance_sum
-            })
+            results.append(
+                {
+                    "num": num,
+                    "method": "sum",
+                    "time": time_sum,
+                    "pixel": max_coordinates_sum[1],
+                    "distance": distance_sum,
+                }
+            )
 
             num_pairs += 1
 
@@ -211,7 +216,9 @@ def process_all_pairs(folder_path):
     if num_pairs > 0:
         avg_time_conv = total_time_conv / num_pairs
         avg_time_sum = total_time_sum / num_pairs
-        print(f"\n\nŚredni czas wykonywania metody konwolucji: {avg_time_conv:.4f} sekund")
+        print(
+            f"\n\nŚredni czas wykonywania metody konwolucji: {avg_time_conv:.4f} sekund"
+        )
         print(f"Średni czas wykonywania metody sumowania: {avg_time_sum:.4f} sekund")
 
     # Posortuj wyniki według metody

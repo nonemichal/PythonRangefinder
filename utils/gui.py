@@ -90,7 +90,8 @@ class GUI(tk.Tk):
             text="Zrób zdjęcie bez lasera",
             command=lambda: self.capture_and_display(1),
             relief="groove",
-            bg="green",
+            bg="#4f4f4f",
+            fg="white",
             width=10,
         )
         self.button1.grid(row=2, column=0, pady=20, padx=5, sticky="ew")
@@ -100,7 +101,8 @@ class GUI(tk.Tk):
             text="Zrób zdjęcie z laserem",
             command=lambda: self.capture_and_display(2),
             relief="groove",
-            bg="green",
+            bg="#4f4f4f",
+            fg="white",
             width=10,
         )
         self.button2.grid(row=2, column=1, pady=20, padx=5, sticky="ew")
@@ -110,7 +112,8 @@ class GUI(tk.Tk):
             text="Wylicz odleglość",
             command=self.calculate_and_display,
             relief="groove",
-            bg="green",
+            bg="#4f4f4f",
+            fg="white",
             width=10,
         )
         self.button3.grid(row=2, column=2, pady=20, padx=5, sticky="ew")
