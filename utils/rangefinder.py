@@ -1,12 +1,12 @@
 # utils/rangefinder.py
 
-from PIL import Image
-import numpy as np
-import cv2
+import csv
 from pathlib import Path
 import os
 import time
-import csv
+from PIL import Image
+import numpy as np
+import cv2
 import re
 
 current_folder = Path(__file__).parent
@@ -176,8 +176,8 @@ def process_all_pairs(folder_path):
                 "num": num,
                 "method": "convolution",
                 "time": time_conv,
-                "distance": distance_conv,
-                "pixel": max_coordinates_conv[1]
+                "pixel": max_coordinates_conv[1],
+                "distance": distance_conv
             })
 
             # Oblicz dystans metodą sumowania
@@ -195,8 +195,8 @@ def process_all_pairs(folder_path):
                 "num": num,
                 "method": "sum",
                 "time": time_sum,
-                "distance": distance_sum,
-                "pixel": max_coordinates_sum[1]
+                "pixel": max_coordinates_sum[1],
+                "distance": distance_sum
             })
 
             num_pairs += 1
@@ -214,12 +214,15 @@ def process_all_pairs(folder_path):
         print(f"\n\nŚredni czas wykonywania metody konwolucji: {avg_time_conv:.4f} sekund")
         print(f"Średni czas wykonywania metody sumowania: {avg_time_sum:.4f} sekund")
 
+    # Posortuj wyniki według metody
+    results_sorted = sorted(results, key=lambda x: x["method"])
+
     # Zapisz wyniki do pliku CSV
     with open(current_folder / ".." / "results.csv", mode="w", newline="") as csv_file:
-        fieldnames = ["num", "method", "time", "distance", "pixel"]
+        fieldnames = ["num", "method", "time", "pixel", "distance"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
-        for result in results:
+        for result in results_sorted:
             writer.writerow(result)
 
     # Usuń plik result_image.png, jeśli istnieje
