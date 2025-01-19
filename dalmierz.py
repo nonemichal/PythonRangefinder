@@ -4,11 +4,11 @@ from utils.gui import GUI
 
 
 def main():
-    # Create an instance of the CameraGUI class
+    # Utwórz instancję klasy CameraGUI
     app = GUI()
-    app.mainloop()  # Run the Tkinter event loop to display the GUI
+    app.mainloop()  # Uruchom pętlę zdarzeń Tkinter, aby wyświetlić GUI
 
 
 if __name__ == "__main__":
-    # Execute the main function if this file is run directly
+    # Wykonaj funkcję main, jeśli ten plik jest uruchamiany bezpośrednio
     main()

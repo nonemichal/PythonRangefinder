@@ -6,18 +6,11 @@ from PIL import Image, ImageTk
 import threading
 import cv2
 from utils.cam import Camera
-from utils.rangefinder import calculate_distance
-from pathlib import Path
 
-# Uzyskaj ścieżkę do bieżącego folderu
-current_folder = Path(__file__).parent
 
 class GUI(tk.Tk):
     def __init__(self):
         super().__init__()
-
-        self.camera = Camera()
-        self.label = Label(self)
 
         self.title("DALMIERZ")
         self.geometry("800x600")
@@ -56,73 +49,51 @@ class GUI(tk.Tk):
         self.window3.grid(row=1, column=2, padx=5, pady=5, sticky="nsew")
 
         #przyciski
-        self.button1 = tk.Button(self, text="Zrób zdjęcie bez lasera", command=lambda: self.capture_and_display(1), relief="groove", bg="green",
+        self.button1 = tk.Button(self, text="", command=self.update_frame, relief="groove", bg="black",
                                  width=10)
         self.button1.grid(row=2, column=0, pady=20, padx=5, sticky="ew")
 
-        self.button2 = tk.Button(self, text="Zrób zdjęcie z laserem", command=lambda: self.capture_and_display(2), relief="groove", bg="green",
+        self.button2 = tk.Button(self, text="", command=self.update_frame, relief="groove", bg="black",
                                  width=10)
         self.button2.grid(row=2, column=1, pady=20, padx=5, sticky="ew")
 
-        self.button3 = tk.Button(self, text="Wylicz odleglość", command= self.calculate_and_display, relief="groove", bg="green",
+        self.button3 = tk.Button(self, text="", command=self.update_frame, relief="groove", bg="black",
                                  width=10)
         self.button3.grid(row=2, column=2, pady=20, padx=5, sticky="ew")
 
 
-        self.distance_label = Label(self, text="Odległość [cm]:", font=("Courier New", 12, "bold"), bg= "black", fg="white", padx=5)
+        self.distance_label = Label(self, text="Odległość [m]:", font=("Courier New", 12, "bold"), bg= "black", fg="white", padx=5)
         self.distance_label.grid(row=3, column=1, pady=(5, 0), sticky="n")
 
         #pole wynikowe
         self.distance_value = Label(self, text="", relief="solid", bg="white", bd=2, highlightbackground="white")
         self.distance_value.grid(row=4, column=1, pady=(0, 20), ipadx=70, ipady=5, sticky="n")
 
+        self.label = Label(self)
+        self.camera = Camera()
         self.thread = threading.Thread(target=self.camera.start_opencv_window)
         self.thread.daemon = True
         self.thread.start()
 
     def update_frame(self):
-        # Pobierz bieżącą klatkę z instancji Camera
+        # Get the current frame from the Camera instance
         self.current_frame = self.camera.get_current_frame()
 
-        # Zaktualizuj GUI Tkinter bieżącą klatką
+        # Update the Tkinter GUI with the current frame
         if self.current_frame is not None:
-            # Konwertuj klatkę OpenCV na format, który może wyświetlić Tkinter
+            # Convert the OpenCV frame to a format Tkinter can display
             image = Image.fromarray(cv2.cvtColor(self.current_frame, cv2.COLOR_BGR2RGB))
             photo = ImageTk.PhotoImage(image=image)
 
-            # Zaktualizuj etykietę nowym obrazem
-            self.label.config(image=photo)
-            self.label.image = photo
+            # Update the label with the new image
+            self.label.config(image=photo)  # type: ignore
+            self.label.image = photo  # type: ignore
 
-    # Przechwyć bieżącą klatkę i wyświetl ją na etykiecie
-    def capture_and_display(self,index):
-        self.camera.save_frame(index)
-
-        image_path = current_folder / '..' / 'photos' / f'captured_frame_{index}.png'
-        self.display_image(image_path, index)
-
-    # Oblicz odległość, wyświetl wynik i obraz różnicowy
-    def calculate_and_display(self):
-        distance = calculate_distance()
-        self.distance_value.config(text=distance)
-
-        image_path = current_folder / '..' / 'photos' / 'result_image_smoothed.png'
-        self.display_image(image_path, 3)
-
-    # Wyświetl obraz na jednej z 3 etykiet
-    def display_image(self,image_path,index):
-        img = Image.open(image_path)
-        img = img.resize((250, 250))
-        img = ImageTk.PhotoImage(img)
-
-        if index == 1 :
-            self.window1.config(image=img)
-            self.window1.image = img
-        if index == 2 :
-            self.window2.config(image=img)
-            self.window2.image = img
-        if index == 3 :
-            self.window3.config(image=img)
-            self.window3.image = img
-
-
+    def save_frame(self):
+        # Save the current frame to a PNG file
+        if self.current_frame is not None:
+            # Save the image as "captured_frame.png" in the current directory
+            cv2.imwrite("captured_frame.png", self.current_frame)
+            print("Frame saved as 'captured_frame.png'")
+        else:
+            print("No frame available to save.")

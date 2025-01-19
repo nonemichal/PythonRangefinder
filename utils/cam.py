@@ -1,39 +1,51 @@
 # utils/cam.py
 
 import cv2
+from pathlib import Path
 
+# Uzyskaj ścieżkę do bieżącego folderu
+current_folder = Path(__file__).parent
 
 class Camera:
     def __init__(self):
-        # Initialize the current frame to None
+        # Zainicjuj bieżącą klatkę jako None
         self.current_frame = None
 
-        # Open the camera using OpenCV (0 refers to the default camera)
+        # Otwórz kamerę za pomocą OpenCV (0 odnosi się do domyślnej kamery)
         self.cap = cv2.VideoCapture(0)
 
     def start_opencv_window(self):
-        # Continuously capture frames from the camera
+        # Ciągłe przechwytywanie klatek z kamery
         while True:
-            # Read a frame from the camera
+            # Odczytaj klatkę z kamery
             ret, frame = self.cap.read()
             if not ret:
-                # If frame capture fails, skip this iteration
+                # Jeśli przechwycenie klatki się nie powiedzie, pomiń tę iterację
                 continue
 
-            # Display the captured frame in an OpenCV window
+            # Wyświetl przechwyconą klatkę w oknie OpenCV
             cv2.imshow("Camera", frame)
 
-            # Update the current frame to the latest captured frame
+            # Zaktualizuj bieżącą klatkę do najnowszej przechwyconej klatki
             self.current_frame = frame
 
-            # Exit the loop if the 'q' key is pressed
+            # Wyjdź z pętli, jeśli naciśnięto klawisz 'q'
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
-        # Release the camera and close OpenCV windows when done
+        # Zwolnij kamerę i zamknij okna OpenCV po zakończeniu
         self.cap.release()
         cv2.destroyAllWindows()
 
     def get_current_frame(self):
-        # Return the most recent captured frame
+        # Zwróć najnowszą przechwyconą klatkę
         return self.current_frame
+
+    def save_frame(self,index):
+        # Zapisz bieżącą klatkę do pliku PNG
+        if  self.current_frame is not None:
+            # Zapisz obraz jako "captured_frame.png" w bieżącym katalogu
+            cv2.imwrite(current_folder / '..' / 'photos' / f'captured_frame_{index}.png', self.current_frame)
+            print(f"Frame saved as 'captured_frame_{index}.png'")
+        else:
+            print("No frame available to save.")

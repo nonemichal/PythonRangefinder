@@ -4,43 +4,96 @@ import pandas as pd
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
-# Define exponential decay function
+# Ustawienie globalnych parametrów czcionki
+plt.rc('font', size=12)
+
+# Definicja funkcji wykładniczego zaniku
 def exponential_func(x, a, b):
     return a * np.exp(-b * x)
 
-# Get the current script's directory
+# Pobierz ścieżkę bieżącego skryptu
 current_path = os.path.dirname(os.path.abspath(__file__))
 
-# Construct the path to data.csv
+# Skonstruuj ścieżkę do pliku data.csv
 data_file = os.path.join(current_path, 'data.csv')
 
-# Load data from CSV
+# Wczytaj dane z pliku CSV
 data = pd.read_csv(data_file)
 
-# Extract x (pixel) and y (distance)
+# Wyodrębnij x (pixel) i y (distance)
 x = data['pixel'].values
 y = data['distance'].values
 
-# Normalize x for better numerical stability
-x_normalized = x / max(x)
-
-# Fit the data with initial guesses
-initial_guesses = [300, 0.01]  # Adjust these values as needed
-params, covariance = curve_fit(exponential_func, x_normalized, y, p0=initial_guesses)
-
-# Extract fitted parameters
+# Dopasowanie wykładnicze
+initial_guesses = [300, 0.01]
+params, covariance = curve_fit(exponential_func, x, y, p0=initial_guesses)
 a, b = params
-print(f"Fitted equation: y = {a:.4f} * exp(-{b:.4f} * x)")
+print(f"Dopasowane równanie wykładnicze: y = {a:.4f} * exp(-{b:.4f} * x)")
 
-# Generate points for the fitted curve
-x_fit = np.linspace(min(x), max(x), 500)
-y_fit = exponential_func(x_fit / max(x), a, b)
+# Generuj punkty dla dopasowanej krzywej wykładniczej
+x_fit = np.linspace(0, 640, 640)
+y_fit_exp = exponential_func(x_fit, a, b)
 
-# Plot the data and the fit
-plt.scatter(x, y, label='Data')
-plt.plot(x_fit, y_fit, color='red', label='Fitted function')
-plt.xlabel('Pixel')
-plt.ylabel('Distance')
-plt.legend()
-plt.title('Exponential Fit')
+# Oblicz współczynnik determinacji R^2 dla dopasowania wykładniczego
+residuals_exp = y - exponential_func(x, a, b)
+ss_res_exp = np.sum(residuals_exp**2)
+ss_tot_exp = np.sum((y - np.mean(y))**2)
+r_squared_exp = 1 - (ss_res_exp / ss_tot_exp)
+
+# Dopasowanie wielomianowe
+degree = 6  # Możliwość wyboru stopnia wielomianu
+poly_coeffs = np.polyfit(x, y, degree)
+poly_func = np.poly1d(poly_coeffs)
+y_fit_poly = poly_func(x_fit)
+print(f"Dopasowane równanie wielomianowe: {poly_func}")
+
+# Oblicz współczynnik determinacji R^2 dla dopasowania wielomianowego
+residuals_poly = y - poly_func(x)
+ss_res_poly = np.sum(residuals_poly**2)
+ss_tot_poly = np.sum((y - np.mean(y))**2)
+r_squared_poly = 1 - (ss_res_poly / ss_tot_poly)
+
+# Funkcja do formatowania równania wielomianowego
+def format_poly_eq(coeffs):
+    terms = []
+    for i, coeff in enumerate(coeffs):
+        power = len(coeffs) - i - 1
+        if power == 0:
+            terms.append(f"{coeff:.4e}")
+        elif power == 1:
+            terms.append(f"{coeff:.4e}x")
+        else:
+            terms.append(f"{coeff:.4e}x^{power}")
+        if i % 2 == 1 and i != len(coeffs) - 1:
+            terms.append("\n")
+    return " + ".join(terms)
+
+# Wykres danych i dopasowania
+plt.figure(figsize=(12, 6))
+
+# Wykres wykładniczy
+plt.subplot(1, 2, 1)
+plt.scatter(x, y, label='Dane')
+plt.plot(x_fit, y_fit_exp, color='red', label='Dopasowana funkcja wykładnicza')
+plt.xlabel('Pixel [-]')
+plt.ylabel('Odległość [cm]')
+plt.legend(loc='upper right')
+plt.title('Dopasowanie wykładnicze')
+plt.xlim(0, 650)
+plt.ylim(0, 300)
+plt.text(0.5, 0.5, f'Równanie: y = {a:.4e} * exp(-{b:.4e} * x)\n\nR^2 = {r_squared_exp:.4f}', transform=plt.gca().transAxes, fontsize=12, verticalalignment='center', horizontalalignment='center')
+
+# Wykres wielomianowy
+plt.subplot(1, 2, 2)
+plt.scatter(x, y, label='Dane')
+plt.plot(x_fit, y_fit_poly, color='blue', label=f'Dopasowana funkcja wielomianowa (stopień {degree})')
+plt.xlabel('Pixel [-]')
+plt.ylabel('Odległość [cm]')
+plt.legend(loc='upper right')
+plt.title('Dopasowanie wielomianowe')
+plt.xlim(0, 650)
+plt.ylim(0, 300)
+plt.text(0.5, 0.5, f'Równanie: {format_poly_eq(poly_coeffs)}\n\nR^2 = {r_squared_poly:.4f}', transform=plt.gca().transAxes, fontsize=12, verticalalignment='center', horizontalalignment='center')
+
+plt.tight_layout()
 plt.show()

@@ -3,8 +3,8 @@ import numpy as np
 import cv2
 
 # Load the two images
-image1 = Image.open("o2.png")
-image2 = Image.open("o1.png")
+image1 = Image.open("n1.png")
+image2 = Image.open("n2.png")
 
 # Ensure both images have the same size and mode (RGB)
 image1 = image1.convert("RGB")
@@ -14,14 +14,16 @@ image2 = image2.convert("RGB")
 image1_array = np.array(image1, dtype=np.uint8)
 image2_array = np.array(image2, dtype=np.uint8)
 
+image1_array = image1_array[:, :, 0]  # Red color only
+image2_array = image2_array[:, :, 0]  # Red color only
+
 # Calculate the difference, avoiding wrap-around
-result_array = image2_array.astype(np.int16) - image1_array.astype(np.int16)
-result_array[result_array < 0] = 0  # Set any negative values to 0
-result_array = result_array.astype(np.uint8)  # Convert back to uint8
+red_channel = image2_array.astype(np.int16) - image1_array.astype(np.int16)
+red_channel[red_channel < 0] = 0  # Set any negative values to 0
+red_channel = red_channel.astype(np.uint8)  # Convert back to uint8
 
-red_channel = result_array[:, :, 0] # Red color only
 
-# Apply a 3x3 averaging filter (moving average) to smooth the result
+# Apply a 6x6 averaging filter (moving average) to smooth the result
 # Kernel for averaging
 kernel = np.ones((6, 6), np.float32) / 9
 red_channel = cv2.filter2D(red_channel, -1, kernel)
@@ -34,11 +36,11 @@ max_coordinates = (0, 0)
 for i in range(red_channel.shape[0] - 8):  # Subtract 8 to fit a 9x9 frame
     for j in range(red_channel.shape[1] - 8):
         # Extract the current 9x9 frame
-        frame = red_channel[i:i+9, j:j+9]
-        
+        frame = red_channel[i : i + 9, j : j + 9]
+
         # Calculate the mean intensity of the current frame
         mean_intensity = np.mean(frame)
-        
+
         # Update max_intensity and max_coordinates if the current mean is the highest found so far
         if mean_intensity > max_intensity:
             max_intensity = mean_intensity
