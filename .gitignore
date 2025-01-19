@@ -64,3 +64,5 @@ dmypy.json
 .settings/
 
 !photos/
+
+*tempCodeRunnerFile*

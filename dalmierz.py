@@ -3,6 +3,7 @@
 from utils.gui import GUI
 
 
+# Główna funkcja programu
 def main():
     # Utwórz instancję klasy CameraGUI
     app = GUI()

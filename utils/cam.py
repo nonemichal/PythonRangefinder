@@ -6,6 +6,7 @@ from pathlib import Path
 # Uzyskaj ścieżkę do bieżącego folderu
 current_folder = Path(__file__).parent
 
+
 class Camera:
     def __init__(self):
         # Zainicjuj bieżącą klatkę jako None
@@ -29,8 +30,11 @@ class Camera:
             # Zaktualizuj bieżącą klatkę do najnowszej przechwyconej klatki
             self.current_frame = frame
 
-            # Wyjdź z pętli, jeśli naciśnięto klawisz 'q'
-            if cv2.waitKey(1) & 0xFF == ord("q"):
+            # Wyjdź z pętli, jeśli naciśnięto klawisz 'q' lub zamknięto okno
+            if (
+                cv2.waitKey(1) & 0xFF == ord("q")
+                or cv2.getWindowProperty("Camera", cv2.WND_PROP_VISIBLE) < 1
+            ):
                 break
 
         # Zwolnij kamerę i zamknij okna OpenCV po zakończeniu
@@ -41,11 +45,14 @@ class Camera:
         # Zwróć najnowszą przechwyconą klatkę
         return self.current_frame
 
-    def save_frame(self,index):
+    def save_frame(self, index):
         # Zapisz bieżącą klatkę do pliku PNG
-        if  self.current_frame is not None:
+        if self.current_frame is not None:
             # Zapisz obraz jako "captured_frame.png" w bieżącym katalogu
-            cv2.imwrite(current_folder / '..' / 'photos' / f'captured_frame_{index}.png', self.current_frame)
-            print(f"Frame saved as 'captured_frame_{index}.png'")
+            cv2.imwrite(
+                current_folder / ".." / "photos" / f"captured_frame_{index}.png",
+                self.current_frame,
+            )
+            print(f"Klatka zapisana jako 'captured_frame_{index}.png'")
         else:
-            print("No frame available to save.")
+            print("Brak dostępnej klatki do zapisania.")
