@@ -1,4 +1,4 @@
-# utils/rangefinder.py
+# utils/algorithm.py
 
 import csv
 from pathlib import Path
