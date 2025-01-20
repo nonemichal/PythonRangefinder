@@ -22,7 +22,7 @@ def find_max_coordinates_convolution(image1_array, image2_array):
     red_channel[red_channel < 0] = 0  # Ustaw wszystkie wartości ujemne na 0
     red_channel = red_channel.astype(np.uint8)  # Konwertuj z powrotem na uint8
 
-    # Zastosuj filtr uśredniający 3x3 (średnia ruchoma) w celu wygładzenia wyniku
+    # Zastosuj filtr uśredniający 6x6 (średnia ruchoma) w celu wygładzenia wyniku
     kernel = np.ones((6, 6), np.float32) / 9
     red_channel = cv2.filter2D(red_channel, -1, kernel)
 
