@@ -6,7 +6,7 @@ from PIL import Image, ImageTk
 import threading
 import cv2
 from utils.cam import Camera
-from utils.rangefinder import calculate_distance
+from utils.algorithm import calculate_distance
 from pathlib import Path
 
 # Uzyskaj ścieżkę do bieżącego folderu
