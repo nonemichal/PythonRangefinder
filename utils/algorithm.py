@@ -1,4 +1,8 @@
 # utils/algorithm.py
+#
+# Opis: Plik zawiera funkcje do przetwarzania obrazów i obliczania odległości.
+# Autorzy: Michał Miler, Magdalena Różycka, Szymon Kosz
+# Data: 22.01.2025
 
 import csv
 from pathlib import Path
@@ -31,8 +35,8 @@ def find_max_coordinates_convolution(image1_array, image2_array):
     max_coordinates = (0, 0)
 
     # Iteruj przez kanał czerwony, przesuwając ramkę 9x9 po obrazie
-    for i in range(red_channel.shape[0] - 8):  # Odejmij 8, aby dopasować ramkę 9x9
-        for j in range(red_channel.shape[1] - 8):
+    for i in range(red_channel.shape[0] - 9):  # Odejmij 9, aby dopasować ramkę 9x9
+        for j in range(red_channel.shape[1] - 9):
             # Wyodrębnij bieżącą ramkę 9x9
             frame = red_channel[i : i + 9, j : j + 9]
 
@@ -42,7 +46,7 @@ def find_max_coordinates_convolution(image1_array, image2_array):
             # Zaktualizuj max_intensity i max_coordinates, jeśli bieżąca średnia jest najwyższa dotychczas
             if mean_intensity > max_intensity:
                 max_intensity = mean_intensity
-                max_coordinates = (i + 5, j + 5)
+                max_coordinates = (i + 4, j + 4)
 
     return max_coordinates, max_intensity, red_channel
 

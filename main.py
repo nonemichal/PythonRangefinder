@@ -1,4 +1,8 @@
 # main.py
+#
+# Opis: Plik zawiera główną funkcję programu, która uruchamia GUI aplikacji.
+# Autorzy: Michał Miler, Magdalena Różycka, Szymon Kosz
+# Data: 22.01.2025
 
 from utils.gui import GUI
 

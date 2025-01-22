@@ -1,4 +1,8 @@
 # utils/gui.py
+#
+# Opis: Plik zawiera klasy i funkcje do obsługi GUI aplikacji.
+# Autorzy: Michał Miler, Magdalena Różycka, Szymon Kosz
+# Data: 22.01.2025
 
 import tkinter as tk
 from tkinter import Label
@@ -166,7 +170,9 @@ class GUI(tk.Tk):
         image_path1 = current_folder / ".." / "photos" / "captured_frame_1.png"
         image_path2 = current_folder / ".." / "photos" / "captured_frame_2.png"
 
-        distance, max_coordinates, max_intensity = calculate_distance(image_path1, image_path2)
+        distance, max_coordinates, max_intensity = calculate_distance(
+            image_path1, image_path2
+        )
         self.distance_value.config(text=distance)
 
         image_path = current_folder / ".." / "photos" / "result_image.png"

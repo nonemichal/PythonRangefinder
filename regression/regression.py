@@ -1,3 +1,9 @@
+# regression/regression.py
+#
+# Opis: Plik zawiera funkcje do analizy regresji i wizualizacji danych.
+# Autorzy: Michał Miler, Magdalena Różycka, Szymon Kosz
+# Data: 22.01.2025
+
 import os
 import numpy as np
 import pandas as pd
@@ -73,55 +79,83 @@ def main():
     ss_tot_poly = np.sum((y - np.mean(y)) ** 2)
     r_squared_poly = 1 - (ss_res_poly / ss_tot_poly)
 
+    # Rozmiar wykresu w centymetrach (konwersja na cale)
+    width_cm = 30  # szerokość w cm
+    height_cm = 15  # wysokość w cm
+    width_in = width_cm / 2.54
+    height_in = height_cm / 2.54
+
     # Wykres danych i dopasowania
-    plt.figure(figsize=(12, 6))
+    fig1, axs1 = plt.subplots(1, 2, figsize=(width_in, height_in))
 
     # Wykres wykładniczy
-    plt.subplot(1, 2, 1)
-    plt.scatter(x, y, label="Dane")
-    plt.plot(x_fit, y_fit_exp, color="red", label="Dopasowana funkcja wykładnicza")
-    plt.xlabel("Pixel [-]")
-    plt.ylabel("Odległość [cm]")
-    plt.legend(loc="upper right", fontsize=12)
-    plt.title("Dopasowanie wykładnicze")
-    plt.xlim(0, 650)
-    plt.ylim(0, 300)
-    plt.text(
-        0.2,
+    axs1[0].scatter(x, y, label="Dane")
+    axs1[0].plot(x_fit, y_fit_exp, color="red", label="Dopasowana funkcja wykładnicza")
+    axs1[0].set_xlabel("Pixel [-]")
+    axs1[0].set_ylabel("Odległość [cm]")
+    axs1[0].legend(loc="upper right", fontsize=12)
+    axs1[0].set_title("Dopasowanie wykładnicze")
+    axs1[0].set_xlim(0, 650)
+    axs1[0].set_ylim(0, 300)
+
+    # Zamiast fig1.figtext() używamy plt.figtext()
+    plt.figtext(
+        0.2,  # Pozycja w układzie współrzędnych figury
         0.5,
         f"Równanie: y = {a:.4e} * exp(-{b:.4e} * x)\n\nR^2 = {r_squared_exp:.4f}",
-        transform=plt.gca().transAxes,
+        ha="left",
+        va="center",
         fontsize=12,
-        verticalalignment="center",
-        horizontalalignment="left",
     )
 
     # Wykres wielomianowy
-    plt.subplot(1, 2, 2)
-    plt.scatter(x, y, label="Dane")
-    plt.plot(
+    axs1[1].scatter(x, y, label="Dane")
+    axs1[1].plot(
         x_fit,
         y_fit_poly,
         color="blue",
         label=f"Dopasowana funkcja wielomianowa (stopień {degree})",
     )
-    plt.xlabel("Pixel [-]")
-    plt.ylabel("Odległość [cm]")
-    plt.legend(loc="upper right", fontsize=12)
-    plt.title("Dopasowanie wielomianowe")
-    plt.xlim(0, 650)
-    plt.ylim(0, 300)
-    plt.text(
-        0.2,
+    axs1[1].set_xlabel("Pixel [-]")
+    axs1[1].set_ylabel("Odległość [cm]")
+    axs1[1].legend(loc="upper right", fontsize=12)
+    axs1[1].set_title("Dopasowanie wielomianowe")
+    axs1[1].set_xlim(0, 650)
+    axs1[1].set_ylim(0, 300)
+
+    # Zamiast fig1.figtext() używamy plt.figtext() dla drugiego wykresu
+    plt.figtext(
+        0.7,  # Pozycja w układzie współrzędnych figury
         0.5,
         f"Równanie: y = {format_poly_eq(poly_coeffs)}\n\nR^2 = {r_squared_poly:.4f}",
-        transform=plt.gca().transAxes,
+        ha="left",
+        va="center",
         fontsize=12,
-        verticalalignment="center",
-        horizontalalignment="left",
     )
 
-    plt.tight_layout()
+    fig1.tight_layout(pad=2.0)
+    plt.show()
+
+    # Wykres punktów pomiarowych
+    fig2, axs2 = plt.subplots(1, 2, figsize=(width_in, height_in))
+
+    axs2[0].scatter(x, y, label="Dane")
+    axs2[0].set_xlabel("Pixel [-]")
+    axs2[0].set_ylabel("Odległość [cm]")
+    axs2[0].set_title("Punkty pomiarowe")
+    axs2[0].set_xlim(0, 650)
+    axs2[0].set_ylim(0, 300)
+    axs2[0].legend(loc="upper right", fontsize=12)
+
+    axs2[1].scatter(x, y, label="Dane")
+    axs2[1].set_xlabel("Pixel [-]")
+    axs2[1].set_ylabel("Odległość [cm]")
+    axs2[1].set_title("Punkty pomiarowe")
+    axs2[1].set_xlim(0, 650)
+    axs2[1].set_ylim(0, 300)
+    axs2[1].legend(loc="upper right", fontsize=12)
+
+    fig2.tight_layout(pad=2.0)
     plt.show()
 
 

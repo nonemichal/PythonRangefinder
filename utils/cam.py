@@ -1,4 +1,8 @@
 # utils/cam.py
+#
+# Opis: Plik zawiera klasy i funkcje do obsługi kamery oraz przechwytywania obrazów.
+# Autorzy: Michał Miler, Magdalena Różycka, Szymon Kosz
+# Data: 22.01.2025
 
 import cv2
 from pathlib import Path
